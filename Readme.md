@@ -1,7 +1,7 @@
 # Личный проект «Кэндишоп» [![Build status][travis-image]][travis-url]
 
 * Студент: [Vadim Grunenko](https://up.htmlacademy.ru/javascript/15/user/507341).
-* Наставник: `Неизвестно`.
+* Наставник: `без наставника`.
 
 ---
 
