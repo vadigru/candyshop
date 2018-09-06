@@ -268,4 +268,4 @@ var renderBasketCards = function (sweetData) {
   return fragment;
 };
 
-goodsCards.appendChild(renderBasketCards(shuffledSweetCards.splice(0, 3)));
+goodsCards.appendChild(renderBasketCards(shuffledSweetCards.splice(0, MAX_BASKET_CARDS)));
