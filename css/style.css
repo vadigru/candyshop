@@ -616,7 +616,7 @@ body {
   transition: background-color 0.2s ease
 }
 .card__btn-favorite--selected {
-  background-color: #8269ff
+  background-color: #8269ff;
 }
 .card__btn {
   display: flex;
