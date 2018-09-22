@@ -304,12 +304,19 @@ favCount.textContent = '(' + 0 + ')';
       addToCart(catalogCardsAll[i], i);
       enableOrder();
       showSweetBasketCards();
+      var goodsCardsAll = goodsCards.querySelectorAll('article');
+      [].forEach.call(goodsCardsAll, function (it) {
+        it.addEventListener('click', amountIncreaseHandler);
+        it.addEventListener('click', amoutDecreaseHandler);
+        it.addEventListener('click', closeCardHandler);
+      });
     }
     // --- показываем/скрываем состав сладости --------------------------------
     if (evt.target.classList.contains('card__btn-composition')) {
       item.querySelector('.card__composition').classList.toggle('card__composition--hidden');
     }
   });
+
 });
 
 // --- идентификатор получаемый из имени файла фотографии ---------------------
@@ -392,7 +399,6 @@ var amountIncreaseHandler = function (evt) {
   increasePrice(value, amount, price);
   increaseValue(value, amount);
 };
-goodsCards.addEventListener('click', amountIncreaseHandler);
 
 // --- уменьшение кол-ва товара в корзине -------------------------------------
 var amoutDecreaseHandler = function (evt) {
@@ -408,8 +414,7 @@ var amoutDecreaseHandler = function (evt) {
     decreaseValue(value);
     decreasePrice(price);
   } else {
-    var targetCard = evt.target.closest('.card-order');
-    goodsCards.removeChild(targetCard);
+    goodsCards.removeChild(card);
     decreasePrice(price);
     if (goodsCards.children.length === 1) {
       totalPrice = 0;
@@ -424,7 +429,6 @@ var amoutDecreaseHandler = function (evt) {
     disableOrder();
   }
 };
-goodsCards.addEventListener('click', amoutDecreaseHandler);
 
 // --- закрытие карточки товара в корзине на крестик ------------------------------
 var closeCardHandler = function (evt) {
@@ -437,8 +441,7 @@ var closeCardHandler = function (evt) {
   if (target === null) {
     return;
   } else {
-    var targetCard = evt.target.closest('.card-order');
-    goodsCards.removeChild(targetCard);
+    goodsCards.removeChild(card);
     if (goodsCards.children.length === 1) {
       totalPrice = 0;
       totalValue = 0;
@@ -454,7 +457,6 @@ var closeCardHandler = function (evt) {
     }
   }
 };
-goodsCards.addEventListener('click', closeCardHandler);
 
 // --- отображаем информацию о количестве/цене в верхней корзине --------------
 var arrangeHeaderBasket = function (basketValue) {
@@ -700,3 +702,135 @@ cardDate.addEventListener('change', cardCheckHanler);
 cardCvc.addEventListener('change', cardCheckHanler);
 cardHolder.addEventListener('change', cardCheckHanler);
 cardHolder.addEventListener('input', nameChangeHandler);
+
+
+// упраление слайдером выбора цены --------------------------------------------
+var right = 240;
+var left = 0;
+var range = document.querySelector('.range');
+var rangeMin = range.querySelector('.range__price--min');
+var rangeMax = range.querySelector('.range__price--max');
+var rangeFillLine = range.querySelector('.range__fill-line');
+var rangeBtnLeft = range.querySelector('.range__btn--left');
+var rangeBtnRight = range.querySelector('.range__btn--right');
+// --- задаем начальные координаты и положение --------------------------------
+rangeBtnLeft.style.left = -10 + 'px';
+rangeBtnLeft.style.zIndex = 1000;
+rangeMin.textContent = '0';
+rangeFillLine.style.left = 0;
+rangeBtnRight.style.right = -5 + 'px';
+rangeBtnRight.style.zIndex = 1000;
+rangeMax.textContent = '100';
+rangeFillLine.style.right = 0;
+// --- отображаем положение в процентах относительно пикселей -----------------
+var currentPositionInPct = function (currentPosition) {
+  return Math.round(currentPosition * 100 / right);
+};
+// --- слуашетель на левый пин ------------------------------------------------
+rangeBtnLeft.addEventListener('mousedown', function (evt) {
+  evt.preventDefault();
+  var startCoords = {
+    x: evt.clientX,
+  };
+  var dragged = false;
+
+  var onMouseMove = function (moveEvt) {
+    moveEvt.preventDefault();
+    dragged = true;
+    var shift = {
+      x: startCoords.x - moveEvt.clientX
+    };
+    startCoords = {
+      x: moveEvt.clientX
+    };
+    var positionLeftShifted = (rangeBtnLeft.offsetLeft - shift.x);
+    if (positionLeftShifted <= -10) {
+      positionLeftShifted = -10;
+    } else if (positionLeftShifted >= right) {
+      positionLeftShifted = right + 'px';
+    } else if (positionLeftShifted >= rangeBtnRight.offsetLeft - 10) {
+      positionLeftShifted = rangeBtnRight.offsetLeft - 10;
+      rangeBtnLeft.style.left = positionLeftShifted + 'px';
+    } else {
+      rangeBtnLeft.style.left = positionLeftShifted + 'px';
+      rangeMin.textContent = currentPositionInPct(positionLeftShifted + 10);
+    }
+    rangeFillLine.style.left = positionLeftShifted + 'px';
+  };
+
+  var onMouseUp = function (upEvt) {
+    upEvt.preventDefault();
+    var positionLeftUp = rangeBtnLeft.offsetLeft;
+    rangeMin.textContent = currentPositionInPct(positionLeftUp + 10);
+
+    if (dragged) {
+      var onClickPreventDefault = function () {
+        evt.preventDefault();
+        rangeBtnLeft.removeEventListener('click', onClickPreventDefault);
+      };
+      rangeBtnLeft.addEventListener('click', onClickPreventDefault);
+    }
+
+    document.removeEventListener('mousemove', onMouseMove);
+    document.removeEventListener('mouseup', onMouseUp);
+  };
+
+  document.addEventListener('mousemove', onMouseMove);
+  document.addEventListener('mouseup', onMouseUp);
+});
+// --- слушатель на правый пин ------------------------------------------------
+rangeBtnRight.addEventListener('mousedown', function (evt) {
+  evt.preventDefault();
+  var startCoords = {
+    x: evt.clientX
+  };
+  var dragged = false;
+
+  var onMouseMove = function (moveEvt) {
+    moveEvt.preventDefault();
+    dragged = true;
+    var shift = {
+      x: startCoords.x - moveEvt.clientX
+    };
+    startCoords = {
+      x: moveEvt.clientX
+    };
+    var positionRightStop = (right - rangeBtnRight.offsetLeft - shift.x);
+    var positionRightShifted = (rangeBtnRight.offsetLeft - shift.x);
+    if (positionRightShifted > right) {
+      positionRightShifted = right + 'px';
+    } else if (positionRightShifted <= left) {
+      positionRightShifted = left + 'px';
+    } else if (positionRightShifted <= rangeBtnLeft.offsetLeft + 10) {
+      positionRightShifted = rangeBtnLeft.offsetLeft;
+      rangeBtnRight.style.left = positionRightShifted + 10 + 'px';
+    } else {
+      rangeBtnRight.style.left = positionRightShifted + 'px';
+      rangeMax.textContent = currentPositionInPct(positionRightShifted);
+    }
+    if (positionRightStop <= 0) {
+      positionRightStop = 0;
+    } else {
+      rangeFillLine.style.right = positionRightStop + 'px';
+    }
+  };
+
+  var onMouseUp = function (upEvt) {
+    upEvt.preventDefault();
+    var positionRightUp = rangeBtnRight.offsetLeft;
+    rangeMax.textContent = currentPositionInPct(positionRightUp);
+    if (dragged) {
+      var onClickPreventDefault = function () {
+        evt.preventDefault();
+        rangeBtnRight.removeEventListener('click', onClickPreventDefault);
+      };
+      rangeBtnRight.addEventListener('click', onClickPreventDefault);
+    }
+
+    document.removeEventListener('mousemove', onMouseMove);
+    document.removeEventListener('mouseup', onMouseUp);
+  };
+
+  document.addEventListener('mousemove', onMouseMove);
+  document.addEventListener('mouseup', onMouseUp);
+});
