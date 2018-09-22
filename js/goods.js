@@ -304,12 +304,19 @@ favCount.textContent = '(' + 0 + ')';
       addToCart(catalogCardsAll[i], i);
       enableOrder();
       showSweetBasketCards();
+      var goodsCardsAll = goodsCards.querySelectorAll('article');
+      [].forEach.call(goodsCardsAll, function (it) {
+        it.addEventListener('click', amountIncreaseHandler);
+        it.addEventListener('click', amoutDecreaseHandler);
+        it.addEventListener('click', closeCardHandler);
+      });
     }
     // --- показываем/скрываем состав сладости --------------------------------
     if (evt.target.classList.contains('card__btn-composition')) {
       item.querySelector('.card__composition').classList.toggle('card__composition--hidden');
     }
   });
+
 });
 
 // --- идентификатор получаемый из имени файла фотографии ---------------------
@@ -392,7 +399,6 @@ var amountIncreaseHandler = function (evt) {
   increasePrice(value, amount, price);
   increaseValue(value, amount);
 };
-goodsCards.addEventListener('click', amountIncreaseHandler);
 
 // --- уменьшение кол-ва товара в корзине -------------------------------------
 var amoutDecreaseHandler = function (evt) {
@@ -408,8 +414,7 @@ var amoutDecreaseHandler = function (evt) {
     decreaseValue(value);
     decreasePrice(price);
   } else {
-    var targetCard = evt.target.closest('.card-order');
-    goodsCards.removeChild(targetCard);
+    goodsCards.removeChild(card);
     decreasePrice(price);
     if (goodsCards.children.length === 1) {
       totalPrice = 0;
@@ -424,7 +429,6 @@ var amoutDecreaseHandler = function (evt) {
     disableOrder();
   }
 };
-goodsCards.addEventListener('click', amoutDecreaseHandler);
 
 // --- закрытие карточки товара в корзине на крестик ------------------------------
 var closeCardHandler = function (evt) {
@@ -437,8 +441,7 @@ var closeCardHandler = function (evt) {
   if (target === null) {
     return;
   } else {
-    var targetCard = evt.target.closest('.card-order');
-    goodsCards.removeChild(targetCard);
+    goodsCards.removeChild(card);
     if (goodsCards.children.length === 1) {
       totalPrice = 0;
       totalValue = 0;
@@ -454,7 +457,6 @@ var closeCardHandler = function (evt) {
     }
   }
 };
-goodsCards.addEventListener('click', closeCardHandler);
 
 // --- отображаем информацию о количестве/цене в верхней корзине --------------
 var arrangeHeaderBasket = function (basketValue) {
