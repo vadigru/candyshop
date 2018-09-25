@@ -1,7 +1,7 @@
 'use strict';
 (function () {
   // добавление товара в избранное ----------------------------------------------
-  var favButtons = document.querySelectorAll('.card__btn-favorite');
+  // var favButtons = document.querySelectorAll('.card__btn-favorite');
   var favoriteToggleHandler = function (evt) {
     evt.preventDefault();
     var favSelected = document.querySelectorAll('.card__btn-favorite--selected');
@@ -17,9 +17,8 @@
   // --- обнуление счетчика избранных товаров -----------------------------------
   var favCount = document.querySelector('label[for="filter-favorite"]+span');
   favCount.textContent = '(' + 0 + ')';
+  window.favorites = {
+    favoriteToggleHandler: favoriteToggleHandler
+  };
 
-  // --- слушатель на избранное -------------------------------------------------
-  [].forEach.call(favButtons, function (item) {
-    item.addEventListener('click', favoriteToggleHandler);
-  });
 }());
