@@ -134,4 +134,83 @@
     document.addEventListener('mousemove', onMouseMove);
     document.addEventListener('mouseup', onMouseUp);
   });
+
+  // сортировка по рейтингу ---------------------------------------------------
+  var filterRatingHandling = function () {
+    var catalogCards = document.querySelector('.catalog__cards');
+    var cCards = document.querySelectorAll('.catalog__card');
+
+    [].forEach.call(cCards, function (item) {
+      catalogCards.removeChild(item);
+    });
+
+    var newArr = window.sweetArray
+        .slice()
+        .sort(function (a, b) {
+          if (b.rating.value === a.rating.value) {
+            return b.rating.number - a.rating.number;
+          } else {
+            return (b.rating.value) - (a.rating.value);
+          }
+        });
+    catalogCards.appendChild(window.renderSweetCards(newArr));
+    cCards = document.querySelectorAll('.catalog__card');
+    window.cart.addAtribute(cCards, newArr);
+    window.cart.addCart(cCards, newArr);
+  };
+
+  // сортировка по цене сначала дешевые ---------------------------------------
+  var filterCheepHandling = function () {
+    var catalogCards = document.querySelector('.catalog__cards');
+    var cCards = document.querySelectorAll('.catalog__card');
+
+    [].forEach.call(cCards, function (item) {
+      catalogCards.removeChild(item);
+    });
+    var newArr = window.sweetArray
+        .slice()
+        .sort(function (a, b) {
+          return a.price - b.price;
+        });
+
+    catalogCards.appendChild(window.renderSweetCards(newArr));
+    cCards = document.querySelectorAll('.catalog__card');
+    window.cart.addAtribute(cCards, newArr);
+    window.cart.addCart(cCards, newArr);
+  };
+
+  var filterExpensiveHandling = function () {
+    var catalogCards = document.querySelector('.catalog__cards');
+    var cCards = document.querySelectorAll('.catalog__card');
+
+    [].forEach.call(cCards, function (item) {
+      catalogCards.removeChild(item);
+    });
+    var newArr = window.sweetArray
+        .slice()
+        .sort(function (a, b) {
+          return b.price - a.price;
+        });
+
+    catalogCards.appendChild(window.renderSweetCards(newArr));
+    cCards = document.querySelectorAll('.catalog__card');
+    window.cart.addAtribute(cCards, newArr);
+    window.cart.addCart(cCards, newArr);
+  };
+
+
+  var filter = function () {
+    var filterRate = document.querySelector('#filter-rating');
+    var filterPriceSmall = document.querySelector('#filter-cheep');
+    var filterPriceBig = document.querySelector('#filter-expensive');
+
+    filterRate.addEventListener('change', filterRatingHandling);
+    filterPriceSmall.addEventListener('change', filterCheepHandling);
+    filterPriceBig.addEventListener('change', filterExpensiveHandling);
+
+  };
+
+  window.filter = {
+    filter: filter
+  };
 }());
