@@ -1,23 +1,14 @@
 'use strict';
 (function () {
-  var catalogCards = document.querySelector('.catalog__cards');
-  var catalogLoad = catalogCards.querySelector('.catalog__load');
 
   // аттрибуты необходимые для определения уникальности -----------------------
   // товара и количества в наличии --------------------------------------------
   var addAtribute = function (cCards, data) {
-    for (var i = 0; i < cCards.length; i++) {
-      cCards[i].setAttribute('data-id', i + 1);
-      cCards[i].setAttribute('data-amount', data[i].amount);
-    }
+    [].forEach.call(cCards, function (item, i) {
+      item.setAttribute('data-id', getIdName(data[i]));
+      item.setAttribute('data-amount', data[i].amount);
+    });
   };
-
-  // скрываем надпись пустого каталога ----------------------------------------
-  var showSweetCards = function () {
-    catalogCards.classList.remove('catalog__cards--load');
-    catalogLoad.classList.add('visually-hidden');
-  };
-  showSweetCards();
 
   // надписи корзины ----------------------------------------------------------
   var goodsWrap = document.querySelector('.goods__card-wrap');
@@ -72,7 +63,6 @@
 
 
   // --- идентификатор получаемый из имени файла фотографии -------------------
-  // --- только не помню зачем мне это было нужно -----------------------------
   var getIdName = function (obj) {
     var pathToStroke = obj.picture.split('.').shift();
     var idname = String(pathToStroke);
@@ -91,9 +81,7 @@
       cardBasketElement.querySelector('.card-order__img').src = './img/cards/' + cardsBasket.picture;
       cardBasketElement.querySelector('.card-order__price').textContent = cardsBasket.price + ' ₽';
       cardBasketElement.querySelector('.card-order__count').value = 1;
-      cardBasketElement.querySelector('.card-order__count').name = getIdName(data[i]);
-      cardBasketElement.querySelector('.card-order__count').id = 'card-order__' + getIdName(data[i]);
-      cardBasketElement.querySelector('.goods_card').setAttribute('data-id', i + 1);
+      cardBasketElement.querySelector('.goods_card').setAttribute('data-id', getIdName(data[i]));
       cardBasketElement.querySelector('.goods_card').setAttribute('data-amount', data[i].amount);
       goodsCards.appendChild(cardBasketElement);
       totalPrice += cardsBasket.price;
