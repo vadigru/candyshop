@@ -4,23 +4,18 @@
   var filterBar = document.querySelector('.catalog__sidebar');
   // морожко ------------------------------------------------------------------
   var iceCream = filterBar.querySelector('[for="filter-icecream"]+span');
-  var iceCreamType = filterBar.querySelector('#filter-icecream+label').textContent;
   var filterIceCream = filterBar.querySelector('#filter-icecream');
   // газировка ----------------------------------------------------------------
   var soda = filterBar.querySelector('[for="filter-soda"]+span');
-  var sodaType = filterBar.querySelector('#filter-soda+label').textContent;
   var filterSoda = filterBar.querySelector('#filter-soda');
   // жувка --------------------------------------------------------------------
   var bubbleGum = filterBar.querySelector('[for="filter-gum"]+span');
-  var bubbleGumType = filterBar.querySelector('#filter-gum+label').textContent;
   var filterBubbleGum = filterBar.querySelector('#filter-gum');
   // мармелад -----------------------------------------------------------------
   var marmalade = filterBar.querySelector('[for="filter-marmalade"]+span');
-  var marmaladeType = filterBar.querySelector('#filter-marmalade+label').textContent;
   var filterMarmalade = filterBar.querySelector('#filter-marmalade');
   // зефир --------------------------------------------------------------------
   var marshmellow = filterBar.querySelector('[for="filter-marshmallows"]+span');
-  var marshmallowType = filterBar.querySelector('#filter-marshmallows+label').textContent;
   var filterMarshmallow = filterBar.querySelector('#filter-marshmallows');
   // сахар веган глутен -------------------------------------------------------
   var sugarFree = filterBar.querySelector('[for="filter-sugar-free"]+span');
@@ -37,6 +32,7 @@
   var goodsAvailable = filterBar.querySelector('[for="filter-availability"]+span');
   var filterAvailableBtn = filterBar.querySelector('#filter-availability');
   // цена большая маленькая рейтинг отмена фильтров----------------------------
+  var filterPopular = filterBar.querySelector('#filter-popular');
   var filterPriceBig = filterBar.querySelector('#filter-expensive');
   var filterPriceSmall = filterBar.querySelector('#filter-cheep');
   var filterRate = filterBar.querySelector('#filter-rating');
@@ -56,7 +52,7 @@
   var rangeBtnRight = range.querySelector('.range__btn--right');
   // --- задаем начальные координаты и положение --------------------------------
   var rangeDefaultPosition = function () {
-    rangeBtnLeft.style.left = 0 + 'px';
+    rangeBtnLeft.style.left = -10 + 'px';
     rangeBtnLeft.style.zIndex = 1000;
     rangeMin.textContent = '0';
     rangeFillLine.style.left = 0;
@@ -198,19 +194,19 @@
 
   var kindCount = function () {
     var whatKind = function (kind) {
-      if (kind.kind === 'Мороженое') {
+      if (kind.kind === 'icecream') {
         iceCreamCount++;
       }
-      if (kind.kind === 'Газировка') {
+      if (kind.kind === 'soda') {
         sodaCount++;
       }
-      if (kind.kind === 'Жевательная резинка') {
+      if (kind.kind === 'gum') {
         bubbleGumCount++;
       }
-      if (kind.kind === 'Мармелад') {
+      if (kind.kind === 'marmalade') {
         marmaladeCount++;
       }
-      if (kind.kind === 'Зефир') {
+      if (kind.kind === 'marshmallows') {
         marshmellowCount++;
       }
       if (kind.nutritionFacts.sugar === false) {
@@ -229,6 +225,7 @@
         goodsAvailableCount++;
       }
     };
+
     window.sweetArray.slice().filter(whatKind);
 
     iceCream.textContent = '(' + iceCreamCount + ')';
@@ -243,13 +240,40 @@
     glutenFree.textContent = '(' + glutenFreeCount + ')';
   };
 
-  // отменяем все фильтры -----------------------------------------------------
+  // отменяем фильтры ---------------------------------------------------------
   var cancelAllFilters = function () {
     var allFilters = document.querySelectorAll('.catalog__filter [type="checkbox"]');
     [].forEach.call(allFilters, function (item) {
       item.checked = false;
     });
+  };
 
+  var cancelTypefilters = function () {
+    if (filterFavoritesBtn.checked || filterAvailableBtn.checked) {
+      filterIceCream.checked = false;
+      filterSoda.checked = false;
+      filterBubbleGum.checked = false;
+      filterMarmalade.checked = false;
+      filterMarshmallow.checked = false;
+      filterSugarFree.checked = false;
+      filterVegetarian.checked = false;
+      filterGlutenFree.checked = false;
+    }
+  };
+
+  var cancelFavoriteAndAvailable = function (evt) {
+    var target = evt.target;
+    if (target === filterIceCream ||
+        target === filterSoda ||
+        target === filterBubbleGum ||
+        target === filterMarmalade ||
+        target === filterMarshmallow ||
+        target === filterSugarFree ||
+        target === filterVegetarian ||
+        target === filterGlutenFree) {
+      filterAvailableBtn.checked = false;
+      filterFavoritesBtn.checked = false;
+    }
   };
 
   // сортировака популярные товары в исходном порядке, ------------------------
@@ -258,6 +282,7 @@
     evt.preventDefault();
     cancelAllFilters();
     rangeDefaultPosition();
+    filterPopular.checked = true;
     updateSweets(evt, window.sweetArray);
   };
   // проверяем наличие избранных товаров --------------------------------------
@@ -268,6 +293,11 @@
   // проверяем товары в наличии -----------------------------------------------
   var isAvailable = function (it) {
     return it.amount > 0;
+  };
+
+  // делаем выборку по цене --------------------------------------------------
+  var isPriceOk = function (value) {
+    return value.price >= parseInt(rangeMin.textContent, 10) && value.price <= parseInt(rangeMax.textContent, 10);
   };
 
   // проверка на сахар вегетарианство глютен ----------------------------------
@@ -281,12 +311,6 @@
 
   var isGluten = function (it) {
     return it.nutritionFacts.gluten === false;
-  };
-
-  // делаем выборку по цене --------------------------------------------------
-  var isPriceOk = function (value) {
-    var res = (value.price >= parseInt(rangeMin.textContent, 10) && value.price <= parseInt(rangeMax.textContent, 10));
-    return res;
   };
 
   // показываем скрываем текст если фильтры слишком строгие -------------------
@@ -315,46 +339,11 @@
     }
   };
 
-  // отрисовываем корточки со сладостями после применения фильтров ------------
-  // применяем сортировку -----------------------------------------------------
-  var updateSweets = function (evt, arr) {
-    var target = evt.target;
-    var cCards = document.querySelectorAll('.catalog__card');
-    [].forEach.call(cCards, function (item) {
-      catalogCards.removeChild(item);
-    });
-    if (target === filterFavoritesBtn) {
-      var tempFavArr = window.sweetArray.slice().filter(isFavorite);
-      arr = tempFavArr.slice().filter(isPriceOk);
-      cancelAllFilters();
-      rangeDefaultPosition();
-      filterFavoritesBtn.checked = true;
-      filterAvailableBtn.checked = false;
-    }
-    if (target === filterAvailableBtn) {
-      var tempAvailableArr = window.sweetArray.slice().filter(isAvailable);
-      arr = tempAvailableArr.slice().filter(isPriceOk);
-      pricePlace.textContent = '(' + arr.length + ')';
-      cancelAllFilters();
-      rangeDefaultPosition();
-      filterAvailableBtn.checked = true;
-      filterFavoritesBtn.checked = false;
-    }
-    if (filterSugarFree.checked ||
-      filterVegetarian.checked ||
-      filterGlutenFree.checked ||
-      filterPriceBig.checked ||
-      filterPriceSmall.checked ||
-      filterRate.checked) {
-      if (filterSugarFree.checked) {
-        arr = arr.slice().filter(isSugar);
-      }
-      if (filterVegetarian.checked) {
-        arr = arr.slice().filter(isVeg);
-      }
-      if (filterGlutenFree.checked) {
-        arr = arr.slice().filter(isGluten);
-      }
+  // сортировка товаров по цене и рейтингу ------------------------------------
+  var sortItems = function (arr) {
+    if (filterPriceBig.checked ||
+        filterPriceSmall.checked ||
+        filterRate.checked) {
       if (filterPriceBig.checked) {
         arr = arr.slice().sort(function (a, b) {
           return b.price - a.price;
@@ -375,46 +364,89 @@
         });
       }
     }
-    isArrayEmpty(arr);
-    arr = arr.slice().filter(isPriceOk);
-    pricePlace.textContent = '(' + arr.length + ')';
-    catalogCards.appendChild(window.renderSweetCards(arr));
-    var favBtnAll = document.querySelectorAll('.card__btn-favorite');
-    [].forEach.call(favBtnAll, function (fav, i) {
-      if (arr[i].favorite === true) {
-        fav.classList.add('card__btn-favorite--selected');
+    return arr;
+  };
+
+  // проверяем есть ли избранные товары и товары в наличии --------------------
+  var checkFavoriteAndAvailability = function (evt, arr) {
+    var target = evt.target;
+    if (filterFavoritesBtn.checked || filterAvailableBtn.checked) {
+      if (filterFavoritesBtn.checked) {
+        arr = window.sweetArray.slice().filter(isFavorite);
+        filterFavoritesBtn.checked = true;
+        filterAvailableBtn.checked = false;
       }
+      if (target === filterAvailableBtn || filterAvailableBtn.checked) {
+        arr = window.sweetArray.slice().filter(isAvailable);
+        filterAvailableBtn.checked = true;
+        filterFavoritesBtn.checked = false;
+      }
+      cancelTypefilters();
+      // rangeDefaultPosition();
+    }
+
+    return arr;
+  };
+  // отрисовываем корточки со сладостями после применения фильтров ------------
+  // применяем сортировку -----------------------------------------------------
+  var updateSweets = function (evt, arr) {
+    var cCards = document.querySelectorAll('.catalog__card');
+    [].forEach.call(cCards, function (item) {
+      catalogCards.removeChild(item);
     });
+
+    if (filterSugarFree.checked ||
+      filterVegetarian.checked ||
+      filterGlutenFree.checked) {
+      if (filterSugarFree.checked) {
+        arr = arr.slice().filter(isSugar);
+      }
+      if (filterVegetarian.checked) {
+        arr = arr.slice().filter(isVeg);
+      }
+      if (filterGlutenFree.checked) {
+        arr = arr.slice().filter(isGluten);
+      }
+      cancelFavoriteAndAvailable(evt);
+    }
+    arr = checkFavoriteAndAvailability(evt, arr);
+    arr = sortItems(arr);
+    arr = arr.slice().filter(isPriceOk);
+    isArrayEmpty(arr);
+    catalogCards.appendChild(window.renderSweetCards(arr));
+    pricePlace.textContent = '(' + arr.length + ')';
     cCards = document.querySelectorAll('.catalog__card');
     window.cart.addAtribute(cCards, arr);
     window.cart.addCart(cCards, arr);
     window.favorites.addToFavorites(arr);
+    window.favorites.arrangeFavorites(arr);
     window.catalog.setPointerToComposition();
   };
 
   // фильтруем массив по заданным критериям -----------------------------------
-  var filterCheck = function (it) {
+  var filterCheck = function (evt, it) {
     var res;
     if (filterIceCream.checked ||
         filterSoda.checked ||
         filterBubbleGum.checked ||
         filterMarmalade.checked ||
         filterMarshmallow.checked) {
-      if (filterIceCream.checked && it.kind === iceCreamType) {
+      if (filterIceCream.checked && it.kind === 'icecream') {
         res = true;
       }
-      if (filterSoda.checked && it.kind === sodaType) {
+      if (filterSoda.checked && it.kind === 'soda') {
         res = true;
       }
-      if (filterBubbleGum.checked && it.kind === bubbleGumType) {
+      if (filterBubbleGum.checked && it.kind === 'gum') {
         res = true;
       }
-      if (filterMarmalade.checked && it.kind === marmaladeType) {
+      if (filterMarmalade.checked && it.kind === 'marmalade') {
         res = true;
       }
-      if (filterMarshmallow.checked && it.kind === marshmallowType) {
+      if (filterMarshmallow.checked && it.kind === 'marshmallows') {
         res = true;
       }
+      cancelFavoriteAndAvailable(evt);
     } else {
       res = window.sweetArray;
     }
@@ -423,22 +455,24 @@
 
   // получаем отфильтрованный массив и передаем на отрисовку ------------------
   var filter = function (evt) {
-    var priceArray = window.sweetArray.slice().filter(isPriceOk);
-    var newSweetArray = priceArray.slice().filter(function (it) {
-      return filterCheck(it);
+    var newSweetArray = window.sweetArray.slice().filter(function (it) {
+      return filterCheck(evt, it);
     });
     updateSweets(evt, newSweetArray);
   };
+
 
   // слушатели для фильтров ---------------------------------------------------
   filterBar.addEventListener('change', function (evt) {
     window.util.debounce(filter(evt));
   });
 
+
   cancelAllFiltersBtn.addEventListener('click', filterPopularHandler);
 
   window.filter = {
     filter: filter,
-    kindCount: kindCount
+    kindCount: kindCount,
+    updateSweets: updateSweets
   };
 }());

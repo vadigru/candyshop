@@ -34,11 +34,25 @@
     window.sweetArray = data.map(function (current) {
       return current;
     });
-    window.sweetArray.forEach(function (item, i) {
-      if (i % 2 === 0) {
-        item.amount = 0;
-        item.favorite = false;
+    window.sweetArray.forEach(function (item) {
+      switch (item.kind) {
+        case 'Мороженое':
+          item.kind = 'icecream';
+          break;
+        case 'Газировка':
+          item.kind = 'soda';
+          break;
+        case 'Жевательная резинка':
+          item.kind = 'gum';
+          break;
+        case 'Мармелад':
+          item.kind = 'marmalade';
+          break;
+        case 'Зефир':
+          item.kind = 'marshmallows';
+          break;
       }
+      item.favorite = false;
     });
     catalogCards.appendChild(window.renderSweetCards(window.sweetArray));
     var cCards = catalogCards.querySelectorAll('.catalog__card');
