@@ -33,8 +33,8 @@
   };
 
   var arrangeFavorites = function (arr) {
-    var favBtnAll = document.querySelectorAll('.card__btn-favorite');
-    [].forEach.call(favBtnAll, function (fav, i) {
+    var favButtons = document.querySelectorAll('.card__btn-favorite');
+    [].forEach.call(favButtons, function (fav, i) {
       if (arr[i].favorite === true) {
         fav.classList.add('card__btn-favorite--selected');
       }

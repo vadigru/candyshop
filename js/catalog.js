@@ -6,7 +6,10 @@
   var inputBtns = filterBar .querySelectorAll('.input-btn__label');
   var rangeBtns = filterBar.querySelectorAll('.range__btn');
   var showAllBtn = filterBar.querySelector('.catalog__submit');
+  var main = document.querySelector('main');
+  var error = document.querySelector('.modal--error');
 
+  // поменять курсор с default на pointer -------------------------------------
   [].forEach.call(inputBtns, function (item) {
     item.style.cursor = 'pointer';
   });
@@ -63,27 +66,21 @@
     showSweetCards();
     setPointerToComposition();
   };
-  // обробатка ошибок при загрузке данных -------------------------------------
-  var onLoadErrorHandle = function (errorMessage) {
-    var node = document.createElement('div');
-    node.style = 'z-index: 100; text-align: center; background-color: rgba(255, 255, 255, 0.8); color: red; line-height: 50px; padding: 0 25px; border-radius: 10px; border: 1px solid black; cursor: pointer;';
-    node.style.position = 'absolute';
-    node.style.right = '15px';
-    node.style.top = '15px';
-    node.style.fontSize = '16px';
-    node.classList.add('errorDialog');
-    node.textContent = errorMessage;
-    catalogCards.insertAdjacentElement('afterbegin', node);
 
-    var nodeIn = document.createElement('div');
-    nodeIn.style = 'z-index: 101; color: black; cursor: pointer;';
-    nodeIn.style.position = 'absolute';
-    nodeIn.style.right = '25px';
-    nodeIn.style.top = '20px';
-    nodeIn.style.fontSize = '12px';
-    nodeIn.classList.add('closeErrorDialog');
-    nodeIn.textContent = 'x';
-    catalogCards.insertAdjacentElement('afterbegin', nodeIn);
+  // обробатка ошибок при загрузке данных -------------------------------------
+  var closeErrorHandler = function (evt) {
+    var nodeIn = main.querySelector('.closeErrorDialog');
+    var node = main.querySelector('.errorDialog');
+    if (evt.keyCode === 27) {
+      node.removeChild(nodeIn);
+      main.removeChild(node);
+      document.removeEventListener('keydown', closeErrorHandler);
+    }
+  };
+  var onLoadErrorHandle = function (errorMessage) {
+    error.classList.remove('modal--hidden');
+    error.querySelector('div p:first-of-type').textContent = errorMessage;
+    document.addEventListener('keydown', window.util.onEscClose);
   };
 
   window.backend.load(onLoadSuccessHandle, onLoadErrorHandle);

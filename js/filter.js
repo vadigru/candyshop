@@ -291,8 +291,8 @@
   };
 
   // проверяем товары в наличии -----------------------------------------------
-  var isAvailable = function (it) {
-    return it.amount > 0;
+  var isAvailable = function (avail) {
+    return avail.amount > 0;
   };
 
   // делаем выборку по цене --------------------------------------------------
@@ -328,11 +328,11 @@
     catalogCards.removeChild(emptyFiltersText);
   };
   // проверяем пустой массив или нет -------------------------------------------
-  var isArrayEmpty = function (arr) {
+  var isArrayEmpty = function (emp) {
     var emptyFiltersText = document.querySelector('.catalog__empty-filter');
-    if (arr.length === 0 && !emptyFiltersText) {
+    if (emp.length === 0 && !emptyFiltersText) {
       showEmptyFiltersText();
-    } else if (arr.length === 0 && emptyFiltersText) {
+    } else if (emp.length === 0 && emptyFiltersText) {
       return;
     } else {
       hideEmptyFiltersText();
@@ -340,22 +340,22 @@
   };
 
   // сортировка товаров по цене и рейтингу ------------------------------------
-  var sortItems = function (arr) {
+  var sortItems = function (sort) {
     if (filterPriceBig.checked ||
         filterPriceSmall.checked ||
         filterRate.checked) {
       if (filterPriceBig.checked) {
-        arr = arr.slice().sort(function (a, b) {
+        sort = sort.slice().sort(function (a, b) {
           return b.price - a.price;
         });
       }
       if (filterPriceSmall.checked) {
-        arr = arr.slice().sort(function (a, b) {
+        sort = sort.slice().sort(function (a, b) {
           return a.price - b.price;
         });
       }
       if (filterRate.checked) {
-        arr = arr.slice().sort(function (a, b) {
+        sort = sort.slice().sort(function (a, b) {
           if (b.rating.value === a.rating.value) {
             return b.rating.number - a.rating.number;
           } else {
@@ -364,32 +364,38 @@
         });
       }
     }
-    return arr;
+    return sort;
   };
 
   // проверяем есть ли избранные товары и товары в наличии --------------------
-  var checkFavoriteAndAvailability = function (evt, arr) {
+  var checkFavoriteAndAvailability = function (evt, fav) {
     var target = evt.target;
     if (filterFavoritesBtn.checked || filterAvailableBtn.checked) {
       if (filterFavoritesBtn.checked) {
-        arr = window.sweetArray.slice().filter(isFavorite);
+        fav = window.sweetArray.slice().filter(isFavorite);
         filterFavoritesBtn.checked = true;
         filterAvailableBtn.checked = false;
+        if (target === filterFavoritesBtn) {
+          rangeDefaultPosition();
+        }
       }
       if (target === filterAvailableBtn || filterAvailableBtn.checked) {
-        arr = window.sweetArray.slice().filter(isAvailable);
+        fav = window.sweetArray.slice().filter(isAvailable);
         filterAvailableBtn.checked = true;
         filterFavoritesBtn.checked = false;
+        if (target === filterAvailableBtn) {
+          rangeDefaultPosition();
+        }
       }
       cancelTypefilters();
-      // rangeDefaultPosition();
+
     }
 
-    return arr;
+    return fav;
   };
   // отрисовываем корточки со сладостями после применения фильтров ------------
   // применяем сортировку -----------------------------------------------------
-  var updateSweets = function (evt, arr) {
+  var updateSweets = function (evt, array) {
     var cCards = document.querySelectorAll('.catalog__card');
     [].forEach.call(cCards, function (item) {
       catalogCards.removeChild(item);
@@ -399,58 +405,58 @@
       filterVegetarian.checked ||
       filterGlutenFree.checked) {
       if (filterSugarFree.checked) {
-        arr = arr.slice().filter(isSugar);
+        array = array.slice().filter(isSugar);
       }
       if (filterVegetarian.checked) {
-        arr = arr.slice().filter(isVeg);
+        array = array.slice().filter(isVeg);
       }
       if (filterGlutenFree.checked) {
-        arr = arr.slice().filter(isGluten);
+        array = array.slice().filter(isGluten);
       }
       cancelFavoriteAndAvailable(evt);
     }
-    arr = checkFavoriteAndAvailability(evt, arr);
-    arr = sortItems(arr);
-    arr = arr.slice().filter(isPriceOk);
-    isArrayEmpty(arr);
-    catalogCards.appendChild(window.renderSweetCards(arr));
-    pricePlace.textContent = '(' + arr.length + ')';
+    array = checkFavoriteAndAvailability(evt, array);
+    array = sortItems(array);
+    array = array.slice().filter(isPriceOk);
+    isArrayEmpty(array);
+    catalogCards.appendChild(window.renderSweetCards(array));
+    pricePlace.textContent = '(' + array.length + ')';
     cCards = document.querySelectorAll('.catalog__card');
-    window.cart.addAtribute(cCards, arr);
-    window.cart.addCart(cCards, arr);
-    window.favorites.addToFavorites(arr);
-    window.favorites.arrangeFavorites(arr);
+    window.cart.addAtribute(cCards, array);
+    window.cart.addCart(cCards, array);
+    window.favorites.addToFavorites(array);
+    window.favorites.arrangeFavorites(array);
     window.catalog.setPointerToComposition();
   };
 
   // фильтруем массив по заданным критериям -----------------------------------
   var filterCheck = function (evt, it) {
-    var res;
+    var result;
     if (filterIceCream.checked ||
         filterSoda.checked ||
         filterBubbleGum.checked ||
         filterMarmalade.checked ||
         filterMarshmallow.checked) {
       if (filterIceCream.checked && it.kind === 'icecream') {
-        res = true;
+        result = true;
       }
       if (filterSoda.checked && it.kind === 'soda') {
-        res = true;
+        result = true;
       }
       if (filterBubbleGum.checked && it.kind === 'gum') {
-        res = true;
+        result = true;
       }
       if (filterMarmalade.checked && it.kind === 'marmalade') {
-        res = true;
+        result = true;
       }
       if (filterMarshmallow.checked && it.kind === 'marshmallows') {
-        res = true;
+        result = true;
       }
       cancelFavoriteAndAvailable(evt);
     } else {
-      res = window.sweetArray;
+      result = window.sweetArray;
     }
-    return res;
+    return result;
   };
 
   // получаем отфильтрованный массив и передаем на отрисовку ------------------
