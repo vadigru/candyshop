@@ -1,50 +1,86 @@
 'use strict';
 (function () {
   var catalogCards = document.querySelector('.catalog__cards');
-  // window.sweetArray = [];
+  var catalogLoad = catalogCards.querySelector('.catalog__load');
+  var filterBar = document.querySelector('.catalog__sidebar');
+  var inputBtns = filterBar .querySelectorAll('.input-btn__label');
+  var rangeBtns = filterBar.querySelectorAll('.range__btn');
+  var showAllBtn = filterBar.querySelector('.catalog__submit');
+  var main = document.querySelector('main');
+  var error = document.querySelector('.modal--error');
+
+  // поменять курсор с default на pointer -------------------------------------
+  [].forEach.call(inputBtns, function (item) {
+    item.style.cursor = 'pointer';
+  });
+
+  [].forEach.call(rangeBtns, function (item) {
+    item.style.cursor = 'pointer';
+  });
+
+  showAllBtn.style.cursor = 'pointer';
+
+  var setPointerToComposition = function () {
+    var compositionBtns = catalogCards.querySelectorAll('.card__btn-composition');
+    [].forEach.call(compositionBtns, function (item) {
+      item.style.cursor = 'pointer';
+    });
+  };
+  // скрываем надпись пустого каталога ----------------------------------------
+  var showSweetCards = function () {
+    catalogCards.classList.remove('catalog__cards--load');
+    catalogLoad.classList.add('visually-hidden');
+  };
 
   // обработка успешно загруженных данных -------------------------------------
   var onLoadSuccessHandle = function (data) {
-    catalogCards.appendChild(window.renderSweetCards(data));
-    var cCards = document.querySelectorAll('.catalog__card');
-    var favButtons = document.querySelectorAll('.card__btn-favorite');
-    window.cart.addAtribute(cCards, data);
-    window.cart.addCart(cCards, data);
-    // новый массив из полученного JSON ---------------------------------------
     window.sweetArray = data.map(function (current) {
       return current;
     });
-
-    // data.forEach(function (item) {
-    //   window.sweetArray.push(item);
-    // });
-    // --- слушатель на избранное ---------------------------------------------
-    [].forEach.call(favButtons, function (item) {
-      item.addEventListener('click', window.favorites.favoriteToggleHandler);
+    window.sweetArray.forEach(function (item) {
+      switch (item.kind) {
+        case 'Мороженое':
+          item.kind = 'icecream';
+          break;
+        case 'Газировка':
+          item.kind = 'soda';
+          break;
+        case 'Жевательная резинка':
+          item.kind = 'gum';
+          break;
+        case 'Мармелад':
+          item.kind = 'marmalade';
+          break;
+        case 'Зефир':
+          item.kind = 'marshmallows';
+          break;
+      }
+      item.favorite = false;
     });
-    window.filter.filter();
+    catalogCards.appendChild(window.renderSweetCards(window.sweetArray));
+    var cCards = catalogCards.querySelectorAll('.catalog__card');
+    window.cart.addAtribute(cCards, window.sweetArray);
+    window.cart.addCart(cCards, window.sweetArray);
+    window.favorites.addToFavorites(window.sweetArray);
+    window.filter.kindCount();
+    showSweetCards();
+    setPointerToComposition();
   };
-  // обробатка ошибок при загрузке данных -------------------------------------
-  var onLoadErrorHandle = function (errorMessage) {
-    var node = document.createElement('div');
-    node.style = 'z-index: 100; text-align: center; background-color: rgba(255, 255, 255, 0.8); color: red; line-height: 50px; padding: 0 25px; border-radius: 10px; border: 1px solid black; cursor: pointer;';
-    node.style.position = 'absolute';
-    node.style.right = '15px';
-    node.style.top = '15px';
-    node.style.fontSize = '16px';
-    node.classList.add('errorDialog');
-    node.textContent = errorMessage;
-    catalogCards.insertAdjacentElement('afterbegin', node);
 
-    var nodeIn = document.createElement('div');
-    nodeIn.style = 'z-index: 101; color: black; cursor: pointer;';
-    nodeIn.style.position = 'absolute';
-    nodeIn.style.right = '25px';
-    nodeIn.style.top = '20px';
-    nodeIn.style.fontSize = '12px';
-    nodeIn.classList.add('closeErrorDialog');
-    nodeIn.textContent = 'x';
-    catalogCards.insertAdjacentElement('afterbegin', nodeIn);
+  // обробатка ошибок при загрузке данных -------------------------------------
+  var closeErrorHandler = function (evt) {
+    var nodeIn = main.querySelector('.closeErrorDialog');
+    var node = main.querySelector('.errorDialog');
+    if (evt.keyCode === 27) {
+      node.removeChild(nodeIn);
+      main.removeChild(node);
+      document.removeEventListener('keydown', closeErrorHandler);
+    }
+  };
+  var onLoadErrorHandle = function (errorMessage) {
+    error.classList.remove('modal--hidden');
+    error.querySelector('div p:first-of-type').textContent = errorMessage;
+    document.addEventListener('keydown', window.util.onEscClose);
   };
 
   window.backend.load(onLoadSuccessHandle, onLoadErrorHandle);
@@ -104,6 +140,10 @@
 
     });
     return fragment;
+  };
+
+  window.catalog = {
+    setPointerToComposition: setPointerToComposition
   };
 
 }());
