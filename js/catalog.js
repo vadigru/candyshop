@@ -1,12 +1,12 @@
 'use strict';
 (function () {
-  var catalogCards = document.querySelector('.catalog__cards');
+  var main = document.querySelector('main');
+  var catalogCards = main.querySelector('.catalog__cards');
   var catalogLoad = catalogCards.querySelector('.catalog__load');
-  var filterBar = document.querySelector('.catalog__sidebar');
+  var filterBar = main.querySelector('.catalog__sidebar');
   var inputBtns = filterBar .querySelectorAll('.input-btn__label');
   var rangeBtns = filterBar.querySelectorAll('.range__btn');
   var showAllBtn = filterBar.querySelector('.catalog__submit');
-  var main = document.querySelector('main');
   var error = document.querySelector('.modal--error');
 
   // поменять курсор с default на pointer -------------------------------------

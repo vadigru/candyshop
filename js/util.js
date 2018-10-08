@@ -2,6 +2,10 @@
 (function () {
   var UPDATE_INTERVAL = 500;
   var lastTimeout;
+  var modal = document.querySelectorAll('.modal');
+  var modalClose = document.querySelectorAll('.modal__close');
+
+  // устранение эффекта дребезжания -------------------------------------------
   var debounce = function (f) {
     if (lastTimeout) {
       window.clearTimeout(lastTimeout);
@@ -10,8 +14,6 @@
   };
 
   // закрытие модального окна -------------------------------------------------
-  var modal = document.querySelectorAll('.modal');
-  var modalClose = document.querySelectorAll('.modal__close');
   var modalHide = function () {
     [].forEach.call(modal, function (item) {
       item.classList.add('modal--hidden');

@@ -1,11 +1,12 @@
 'use strict';
 (function () {
-  // --- обнуление счетчика избранных товаров -----------------------------------
   var favCount = document.querySelector('label[for="filter-favorite"]+span');
+  var favCounter = 0;
+
+  // --- обнуление счетчика избранных товаров -----------------------------------
   favCount.textContent = '(' + 0 + ')';
 
   // добавление товара в избранное ----------------------------------------------
-  var favCounter = 0;
   var favoriteToggleHandler = function (evt, i, array) {
     evt.preventDefault();
     if (!evt.target.classList.contains('card__btn-favorite--selected') && array[i].favorite === false) {
