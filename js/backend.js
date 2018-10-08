@@ -1,5 +1,4 @@
 'use strict';
-
 (function () {
   var UPLOAD_URL = 'https://js.dump.academy/candyshop';
   var LOAD_URL = 'https://js.dump.academy/candyshop/data';

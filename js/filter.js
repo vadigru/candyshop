@@ -2,54 +2,53 @@
 (function () {
   var catalogCards = document.querySelector('.catalog__cards');
   var filterBar = document.querySelector('.catalog__sidebar');
-  // морожко ------------------------------------------------------------------
   var iceCream = filterBar.querySelector('[for="filter-icecream"]+span');
   var filterIceCream = filterBar.querySelector('#filter-icecream');
-  // газировка ----------------------------------------------------------------
   var soda = filterBar.querySelector('[for="filter-soda"]+span');
   var filterSoda = filterBar.querySelector('#filter-soda');
-  // жувка --------------------------------------------------------------------
   var bubbleGum = filterBar.querySelector('[for="filter-gum"]+span');
   var filterBubbleGum = filterBar.querySelector('#filter-gum');
-  // мармелад -----------------------------------------------------------------
   var marmalade = filterBar.querySelector('[for="filter-marmalade"]+span');
   var filterMarmalade = filterBar.querySelector('#filter-marmalade');
-  // зефир --------------------------------------------------------------------
   var marshmellow = filterBar.querySelector('[for="filter-marshmallows"]+span');
   var filterMarshmallow = filterBar.querySelector('#filter-marshmallows');
-  // сахар веган глутен -------------------------------------------------------
   var sugarFree = filterBar.querySelector('[for="filter-sugar-free"]+span');
   var filterSugarFree = filterBar.querySelector('#filter-sugar-free');
   var vegetarian = filterBar.querySelector('[for="filter-vegetarian"]+span');
   var filterVegetarian = filterBar.querySelector('#filter-vegetarian');
   var glutenFree = filterBar.querySelector('[for="filter-gluten-free"]+span');
   var filterGlutenFree = filterBar.querySelector('#filter-gluten-free');
-  // цена ползунок ------------------------------------------------------------
   var pricePlace = filterBar.querySelector('.range__count');
-  // избранные товары ---------------------------------------------------------
   var filterFavoritesBtn = filterBar.querySelector('#filter-favorite');
-  // товары в наличии ---------------------------------------------------------
   var goodsAvailable = filterBar.querySelector('[for="filter-availability"]+span');
   var filterAvailableBtn = filterBar.querySelector('#filter-availability');
-  // цена большая маленькая рейтинг отмена фильтров----------------------------
   var filterPopular = filterBar.querySelector('#filter-popular');
   var filterPriceBig = filterBar.querySelector('#filter-expensive');
   var filterPriceSmall = filterBar.querySelector('#filter-cheep');
   var filterRate = filterBar.querySelector('#filter-rating');
   var cancelAllFiltersBtn = filterBar.querySelector('.catalog__submit');
-
-  // упраление слайдером выбора цены --------------------------------------------
-  var MAX = 240;
-  var MIN = 0;
-  var PIN_SIZE = 10;
-  var PIN_SIZE_HALF = PIN_SIZE / 2;
-  var PCT = 100;
+  var marshmellowCount = 0;
+  var bubbleGumCount = 0;
+  var iceCreamCount = 0;
+  var sodaCount = 0;
+  var marmaladeCount = 0;
+  var priceCount = 0;
+  var sugarFreeCount = 0;
+  var vegetarianCount = 0;
+  var glutenFreeCount = 0;
+  var goodsAvailableCount = 0;
   var range = document.querySelector('.range');
   var rangeMin = range.querySelector('.range__price--min');
   var rangeMax = range.querySelector('.range__price--max');
   var rangeFillLine = range.querySelector('.range__fill-line');
   var rangeBtnLeft = range.querySelector('.range__btn--left');
   var rangeBtnRight = range.querySelector('.range__btn--right');
+  var MAX = 240;
+  var MIN = 0;
+  var PIN_SIZE = 10;
+  var PIN_SIZE_HALF = PIN_SIZE / 2;
+  var PCT = 100;
+
   // --- задаем начальные координаты и положение --------------------------------
   var rangeDefaultPosition = function () {
     rangeBtnLeft.style.left = -10 + 'px';
@@ -63,7 +62,6 @@
   };
 
   rangeDefaultPosition();
-
   // --- отображаем положение в процентах относительно пикселей -----------------
   var currentPositionInPct = function (currentPosition) {
     return Math.round(currentPosition * PCT / MAX);
@@ -181,17 +179,6 @@
   });
 
   // получаем количество товаров по типу --------------------------------------
-  var marshmellowCount = 0;
-  var bubbleGumCount = 0;
-  var iceCreamCount = 0;
-  var sodaCount = 0;
-  var marmaladeCount = 0;
-  var priceCount = 0;
-  var sugarFreeCount = 0;
-  var vegetarianCount = 0;
-  var glutenFreeCount = 0;
-  var goodsAvailableCount = 0;
-
   var kindCount = function () {
     var whatKind = function (kind) {
       if (kind.kind === 'icecream') {

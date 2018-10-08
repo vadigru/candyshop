@@ -1,11 +1,11 @@
 'use strict';
 (function () {
-  // валидация карты ----------------------------------------------------------
   var payment = document.querySelector('.payment');
   var cardNumber = payment.querySelector('#payment__card-number');
   var cardDate = payment.querySelector('#payment__card-date');
   var cardCvc = payment.querySelector('#payment__card-cvc');
   var cardHolder = payment.querySelector('#payment__cardholder');
+
   // --- валидация карты по алгоритму луна ------------------------------------
   var luhnCheck = function (string) {
     var stringArray = string.split('');
@@ -85,7 +85,7 @@
     var cardValue = cardNumber.value;
     var cardHolderName = cardHolder.value;
     var cardStatus = document.querySelector('.payment__card-status');
-    if (luhnCheck(cardValue) === true && dateCheck() === true && cardCvc.value !== '' && holderCheck(cardHolderName) === true) {
+    if (luhnCheck(cardValue) === true && dateCheck() === true && parseInt(cardCvc.value, 10) >= 100 && parseInt(cardCvc.value, 10) <= 999 && holderCheck(cardHolderName) === true) {
       cardStatus.textContent = 'Одобрен';
     } else {
       cardStatus.textContent = 'Неизвестен';

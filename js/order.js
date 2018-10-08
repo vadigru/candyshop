@@ -16,11 +16,14 @@
   var deliveryCourier = delivery.querySelector('.deliver__courier');
   var deliveryToggle = delivery.querySelector('.deliver__toggle');
   var deliveryFloor = delivery.querySelector('#deliver__floor');
-  var success = document.querySelector('.modal--success');
-  var error = document.querySelector('.modal--error');
-  var submitForm = document.querySelector('.buy form');
+  var modalSuccess = document.querySelector('.modal--success');
+  var modalError = document.querySelector('.modal--error');
   var modalValidation = document.querySelector('.modal--validation');
+  var submitForm = document.querySelector('.buy form');
   var cardStatus = document.querySelector('.payment__card-status');
+  var storeList = document.querySelector('.deliver__store-list');
+  var map = document.querySelector('.deliver__store-map-wrap');
+  var mapDescription = map.querySelector('p');
 
   // обработка формы платежей -------------------------------------------------
   // --- переключение метода оплаты безнал/кэш --------------------------------
@@ -72,6 +75,15 @@
   };
   deliveryToggle.addEventListener('click', deliveryToggleHandler);
 
+  // связываем станцию метро и карту ------------------------------------------
+  var showMap = function (evt) {
+    if (map.contains(mapDescription)) {
+      map.removeChild(mapDescription);
+    }
+    if (evt.target.value !== '') {
+      map.querySelector('img').src = './img/map/' + evt.target.value + '.jpg';
+    }
+  };
   // сбрасываем форму на значения по умолчанию при успешной отправке данных ---
   var formReset = function () {
     var form = document.querySelectorAll('form');
@@ -84,12 +96,12 @@
 
   // обработка успешной/не успешной отправки данных на сервер -----------------
   var showSuccess = function () {
-    success.classList.remove('modal--hidden');
+    modalSuccess.classList.remove('modal--hidden');
     document.addEventListener('keydown', window.util.onEscClose);
   };
 
   var showError = function () {
-    error.classList.remove('modal--hidden');
+    modalError.classList.remove('modal--hidden');
     document.addEventListener('keydown', window.util.onEscClose);
   };
 
@@ -114,5 +126,7 @@
       modalValidation.classList.remove('modal--hidden');
     }
   });
+
+  storeList.addEventListener('click', showMap);
 
 }());
