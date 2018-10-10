@@ -1,24 +1,24 @@
 'use strict';
 (function () {
-  var headerBasket = document.querySelector('.main-header__basket');
-  var goodsBuy = document.querySelector('.buy');
-  var goodsCards = goodsBuy.querySelector('.goods__cards');
-  var goodsCardEmpty = goodsBuy.querySelector('.goods__card-empty');
-  var goodsCardTotal = goodsBuy.querySelector('.goods__total');
-  var goodsPrice = goodsBuy.querySelector('.goods__total-count');
-  var orderButton = goodsBuy.querySelector('.buy__submit-btn');
-  var orderInputs = goodsBuy.querySelectorAll('#order input');
-  var cardStatus = goodsBuy.querySelector('.payment__card-status');
-  var creditCardInputs = goodsBuy.querySelectorAll('.payment__inputs input');
-  var orderInputsCourier = goodsBuy.querySelector('#order .deliver__courier input');
-  var email = goodsBuy.querySelector('#contact-data__email');
+  var cartTop = document.querySelector('.main-header__basket');
+  var orederArea = document.querySelector('.buy');
+  var cartArea = orederArea.querySelector('.goods__cards');
+  var emtyCartText = orederArea.querySelector('.goods__card-empty');
+  var cartTotalArea = orederArea.querySelector('.goods__total');
+  var cartResult = orederArea.querySelector('.goods__total-count');
+  var orderButton = orederArea.querySelector('.buy__submit-btn');
+  var orderFields = orederArea.querySelectorAll('#order input');
+  var creditCardStatus = orederArea.querySelector('.payment__card-status');
+  var creditCardFields = orederArea.querySelectorAll('.payment__inputs input');
+  var courierField = orederArea.querySelector('#order .deliver__courier input');
+  var buyerEmail = orederArea.querySelector('#contact-data__email');
   var totalPrice = 0;
   var totalValue = 0;
 
   // аттрибуты необходимые для определения уникальности -----------------------
   // товара и количества в наличии --------------------------------------------
-  var addAtribute = function (cCards, data) {
-    [].forEach.call(cCards, function (item, i) {
+  var addAtribute = function (products, data) {
+    [].forEach.call(products, function (item, i) {
       item.setAttribute('data-id', getIdName(data[i]));
       item.setAttribute('data-amount', data[i].amount);
     });
@@ -26,36 +26,36 @@
 
   // --- скрываем надпись пустой корзины --------------------------------------
   var showSweetBasketCards = function () {
-    goodsCards.classList.remove('goods__cards--empty');
-    goodsCardTotal.classList.remove('visually-hidden');
-    goodsCardEmpty.classList.add('visually-hidden');
+    cartArea.classList.remove('goods__cards--empty');
+    cartTotalArea.classList.remove('visually-hidden');
+    emtyCartText.classList.add('visually-hidden');
   };
 
   // --- показываем надпись пустой корзины ------------------------------------
   var hideSweetBasketCards = function () {
-    if (goodsCards.children.length > 1) {
+    if (cartArea.children.length > 1) {
       return;
     } else {
-      goodsCards.classList.add('catalog__cards--load');
-      goodsCardTotal.classList.add('visually-hidden');
-      goodsCardEmpty.classList.remove('visually-hidden');
+      cartArea.classList.add('catalog__cards--load');
+      cartTotalArea.classList.add('visually-hidden');
+      emtyCartText.classList.remove('visually-hidden');
     }
   };
 
   // добавление товара в корзину и показать/скрыть состав ---------------------
-  var addCart = function (cCards, data) {
-    [].forEach.call(cCards, function (item, i) {
+  var addCart = function (products, data) {
+    [].forEach.call(products, function (item, i) {
       item.addEventListener('click', function (evt) {
         evt.preventDefault();
         if (evt.target.classList.contains('card__btn')) {
           if (evt.currentTarget.classList.contains('card--soon')) {
             return;
           }
-          addToCart(cCards[i], data, i);
+          addToCart(products[i], data, i);
           enableOrder();
           showSweetBasketCards();
-          var goodsCardsAll = goodsCards.querySelectorAll('article');
-          [].forEach.call(goodsCardsAll, function (it) {
+          var cartItems = cartArea.querySelectorAll('article');
+          [].forEach.call(cartItems, function (it) {
             it.addEventListener('click', amountIncreaseHandler);
             it.addEventListener('click', amoutDecreaseHandler);
             it.addEventListener('click', closeCardHandler);
@@ -78,18 +78,18 @@
 
   // --- управление товаром в корзине -----------------------------------------
   var addToCart = function (target, data, i) {
-    var dataAttributeId = goodsCards.querySelector('[data-id="' + target.dataset.id + '"]');
+    var dataAttributeId = cartArea.querySelector('[data-id="' + target.dataset.id + '"]');
     if (dataAttributeId === null) {
-      var cardsBasket = data[i];
-      var cardBasketElement = document.querySelector('#card-order').content.cloneNode(true);
-      cardBasketElement.querySelector('.card-order__title').textContent = cardsBasket.name;
-      cardBasketElement.querySelector('.card-order__img').src = './img/cards/' + cardsBasket.picture;
-      cardBasketElement.querySelector('.card-order__price').textContent = cardsBasket.price + ' ₽';
-      cardBasketElement.querySelector('.card-order__count').value = 1;
-      cardBasketElement.querySelector('.goods_card').setAttribute('data-id', getIdName(data[i]));
-      cardBasketElement.querySelector('.goods_card').setAttribute('data-amount', data[i].amount);
-      goodsCards.appendChild(cardBasketElement);
-      totalPrice += cardsBasket.price;
+      var basketItem = data[i];
+      var basketItemElement = document.querySelector('#card-order').content.cloneNode(true);
+      basketItemElement.querySelector('.card-order__title').textContent = basketItem.name;
+      basketItemElement.querySelector('.card-order__img').src = './img/cards/' + basketItem.picture;
+      basketItemElement.querySelector('.card-order__price').textContent = basketItem.price + ' ₽';
+      basketItemElement.querySelector('.card-order__count').value = 1;
+      basketItemElement.querySelector('.goods_card').setAttribute('data-id', getIdName(data[i]));
+      basketItemElement.querySelector('.goods_card').setAttribute('data-amount', data[i].amount);
+      cartArea.appendChild(basketItemElement);
+      totalPrice += basketItem.price;
       totalValue++;
       arrangeFooterBasket(totalPrice, totalValue);
       arrangeHeaderBasket(totalValue);
@@ -104,18 +104,18 @@
 
   // --- увеличение/уменьшение количества товара в корзине --------------------
   var increasePrice = function (value, amount, price) {
-    var basketCards = document.querySelectorAll('.goods_card .card-order__price');
+    var basketItems = document.querySelectorAll('.goods_card .card-order__price');
     if (value.value === amount) {
       return;
     }
     totalPrice += price;
-    arrangeFooterBasket(totalPrice, basketCards.length);
+    arrangeFooterBasket(totalPrice, basketItems.length);
     return;
   };
   var decreasePrice = function (price) {
-    var basketCards = document.querySelectorAll('.goods_card .card-order__price');
+    var basketItems = document.querySelectorAll('.goods_card .card-order__price');
     totalPrice -= price;
-    arrangeFooterBasket(totalPrice, basketCards.length);
+    arrangeFooterBasket(totalPrice, basketItems.length);
   };
 
   // --- увеличиваем/уменьшаем количество добавленных товаров -----------------
@@ -159,19 +159,19 @@
       decreasePrice(price);
       arrangeHeaderBasket(totalValue);
     } else {
-      goodsCards.removeChild(card);
+      cartArea.removeChild(card);
       decreasePrice(price);
-      if (goodsCards.children.length === 1) {
+      if (cartArea.children.length === 1) {
         totalPrice = 0;
         totalValue = 0;
         arrangeHeaderBasket(totalValue);
         hideSweetBasketCards();
+        disableOrder();
       }
-      if (goodsCards.children.length > 1) {
+      if (cartArea.children.length > 1) {
         totalValue--;
         arrangeHeaderBasket(totalValue);
       }
-      disableOrder();
     }
   };
 
@@ -186,15 +186,15 @@
     if (target === null) {
       return;
     } else {
-      goodsCards.removeChild(card);
-      if (goodsCards.children.length === 1) {
+      cartArea.removeChild(card);
+      if (cartArea.children.length === 1) {
         totalPrice = 0;
         totalValue = 0;
         disableOrder();
         arrangeHeaderBasket(totalValue);
         hideSweetBasketCards();
       }
-      if (goodsCards.children.length > 1) {
+      if (cartArea.children.length > 1) {
         totalValue--;
         decreaseValue(value);
         decreasePrice(price);
@@ -205,9 +205,9 @@
 
   // очищаем и обнуляем корзину -----------------------------------------------
   var cartEmpty = function () {
-    var goodsCardsAll = goodsCards.querySelectorAll('article');
-    [].forEach.call(goodsCardsAll, function (item) {
-      goodsCards.removeChild(item);
+    var cartItems = cartArea.querySelectorAll('article');
+    [].forEach.call(cartItems, function (item) {
+      cartArea.removeChild(item);
     });
     totalPrice = 0;
     totalValue = 0;
@@ -215,7 +215,7 @@
     arrangeFooterBasket(totalPrice, totalValue);
     hideSweetBasketCards();
     disableOrder();
-    cardStatus.textContent = 'Не определён';
+    creditCardStatus.textContent = 'Не определён';
   };
 
   // --- отображаем информацию о количестве/цене в верхней корзине ------------
@@ -227,30 +227,30 @@
     var basketValueNumberSecond = array[1];
     if (array.length === 1 || basketValueNumberSecond === 1) {
       if (basketValue === 0) {
-        headerBasket.textContent = 'В корзине нет товаров';
+        cartTop.textContent = 'В корзине нет товаров';
       }
       if (basketValue === 1) {
-        headerBasket.textContent = 'В корзине ' + basketValue + ' товар';
+        cartTop.textContent = 'В корзине ' + basketValue + ' товар';
       }
       if (basketValue > 1 && basketValue <= 4) {
-        headerBasket.textContent = 'В корзине ' + basketValue + ' товара';
+        cartTop.textContent = 'В корзине ' + basketValue + ' товара';
       }
       if (basketValue > 4 && basketValue <= 19) {
-        headerBasket.textContent = 'В корзине ' + basketValue + ' товаров';
+        cartTop.textContent = 'В корзине ' + basketValue + ' товаров';
       }
     }
     if (array.length > 1 && basketValueNumberSecond !== 1) {
       if (basketValueNumber === 0) {
-        headerBasket.textContent = 'В корзине ' + basketValue + ' товаров';
+        cartTop.textContent = 'В корзине ' + basketValue + ' товаров';
       }
       if (basketValueNumber === 1) {
-        headerBasket.textContent = 'В корзине ' + basketValue + ' товар';
+        cartTop.textContent = 'В корзине ' + basketValue + ' товар';
       }
       if (basketValueNumber >= 2 && basketValueNumber <= 4) {
-        headerBasket.textContent = 'В корзине ' + basketValue + ' товара';
+        cartTop.textContent = 'В корзине ' + basketValue + ' товара';
       }
       if (basketValueNumber > 4 && basketValueNumber <= 9) {
-        headerBasket.textContent = 'В корзине ' + basketValue + ' товаров';
+        cartTop.textContent = 'В корзине ' + basketValue + ' товаров';
       }
     }
   };
@@ -265,34 +265,34 @@
     if (array.length === 1 || basketValueNumberSecond === 1) {
 
       if (basketValue === 1) {
-        goodsPrice.textContent = 'Итого за ' + basketValue + ' товар ' + obj + ' ₽';
+        cartResult.textContent = 'Итого за ' + basketValue + ' товар ' + obj + ' ₽';
       }
       if (basketValue > 1 && basketValue <= 4) {
-        goodsPrice.textContent = 'Итого за ' + basketValue + ' товара ' + obj + ' ₽';
+        cartResult.textContent = 'Итого за ' + basketValue + ' товара ' + obj + ' ₽';
       }
       if (basketValue > 4 && basketValue <= 19) {
-        goodsPrice.textContent = 'Итого за ' + basketValue + ' товаров ' + obj + ' ₽';
+        cartResult.textContent = 'Итого за ' + basketValue + ' товаров ' + obj + ' ₽';
       }
     }
     if (array.length > 1 && basketValueNumberSecond !== 1) {
       if (basketValueNumber === 0) {
-        goodsPrice.textContent = 'Итого за ' + basketValue + ' товаров ' + obj + ' ₽';
+        cartResult.textContent = 'Итого за ' + basketValue + ' товаров ' + obj + ' ₽';
       }
       if (basketValueNumber === 1) {
-        goodsPrice.textContent = 'Итого за ' + basketValue + ' товар ' + obj + ' ₽';
+        cartResult.textContent = 'Итого за ' + basketValue + ' товар ' + obj + ' ₽';
       }
       if (basketValueNumber >= 2 && basketValueNumber <= 4) {
-        goodsPrice.textContent = 'Итого за ' + basketValue + ' товара ' + obj + ' ₽';
+        cartResult.textContent = 'Итого за ' + basketValue + ' товара ' + obj + ' ₽';
       }
       if (basketValueNumber > 4 && basketValueNumber <= 9) {
-        goodsPrice.textContent = 'Итого за ' + basketValue + ' товаров ' + obj + ' ₽';
+        cartResult.textContent = 'Итого за ' + basketValue + ' товаров ' + obj + ' ₽';
       }
     }
   };
 
   // блокируем поля ввода данных ----------------------------------------------
   var disableOrder = function () {
-    [].forEach.call(orderInputs, function (item) {
+    [].forEach.call(orderFields, function (item) {
       item.disabled = true;
     });
     orderButton.disabled = true;
@@ -301,18 +301,18 @@
 
   // разблокируем поля ввода данных, если корзина не пустая -------------------
   var enableOrder = function () {
-    [].forEach.call(orderInputs, function (item) {
+    [].forEach.call(orderFields, function (item) {
       item.disabled = false;
     });
-    [].forEach.call(creditCardInputs, function (item) {
+    [].forEach.call(creditCardFields, function (item) {
       item.required = true;
     });
-    [].forEach.call(orderInputsCourier, function (item) {
+    [].forEach.call(courierField, function (item) {
       item.required = false;
       item.desabled = true;
     });
     orderButton.disabled = false;
-    email.required = false;
+    buyerEmail.required = false;
   };
 
   window.cart = {

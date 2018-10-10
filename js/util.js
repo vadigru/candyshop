@@ -6,11 +6,13 @@
   var modalClose = document.querySelectorAll('.modal__close');
 
   // устранение эффекта дребезжания -------------------------------------------
-  var debounce = function (f) {
+  var debounce = function (evt) {
     if (lastTimeout) {
-      window.clearTimeout(lastTimeout);
+      clearTimeout(lastTimeout);
     }
-    lastTimeout = window.setTimeout(f, UPDATE_INTERVAL);
+    lastTimeout = setTimeout(function () {
+      window.filter.filter(evt);
+    }, UPDATE_INTERVAL);
   };
 
   // закрытие модального окна -------------------------------------------------
@@ -32,7 +34,7 @@
   };
 
   var isEscEvent = function (evt, action) {
-    if (evt.keyCode === 27) {
+    if (evt.keyCode === window.util.ESC_KEYCODE) {
       action();
     }
   };
@@ -43,6 +45,7 @@
 
   window.util = {
     onEscClose: onEscClose,
-    debounce: debounce
+    debounce: debounce,
+    ESC_KEYCODE: 27
   };
 }());
