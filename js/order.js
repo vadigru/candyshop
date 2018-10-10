@@ -1,27 +1,32 @@
 'use strict';
 (function () {
-  var payment = document.querySelector('.payment');
-  var paymentGroup = payment.querySelectorAll('.payment__inputs input');
-  var payMethodToggle = payment.querySelector('.payment__method');
-  var payCard = payment.querySelector('#payment__card');
-  var creditCard = payment.querySelector('.payment__card-wrap');
-  var creditCardInputs = creditCard.querySelectorAll('input');
-  var cash = payment.querySelector('.payment__cash-wrap');
-  var delivery = document.querySelector('.deliver');
-  var store = delivery.querySelector('#deliver__store');
-  var courier = delivery.querySelector('#deliver__courier');
-  var deliveryField = delivery.querySelector('.deliver__entry-fields-wrap');
-  var deliveryInputs = deliveryField.querySelectorAll('input');
-  var deliveryStore = delivery.querySelector('.deliver__store');
-  var deliveryCourier = delivery.querySelector('.deliver__courier');
-  var deliveryToggle = delivery.querySelector('.deliver__toggle');
-  var deliveryFloor = delivery.querySelector('#deliver__floor');
-  var modalSuccess = document.querySelector('.modal--success');
-  var modalError = document.querySelector('.modal--error');
-  var modalValidation = document.querySelector('.modal--validation');
+  var payArea = document.querySelector('.payment');
+  var payFields = payArea.querySelectorAll('.payment__inputs input');
+  var payMethodToggle = payArea.querySelector('.payment__method');
+  var payCard = payArea.querySelector('#payment__card');
+  var payCreditCard = payArea.querySelector('.payment__card-wrap');
+  var payCreditCardNum = payArea.querySelector('#payment__card-number');
+  var payCreditCardFields = payCreditCard.querySelectorAll('input');
+  var payCash = payArea.querySelector('.payment__cash-wrap');
+
+  var shipmentArea = document.querySelector('.deliver');
+  var store = shipmentArea.querySelector('#deliver__store');
+  var courier = shipmentArea.querySelector('#deliver__courier');
+  var shipmentField = shipmentArea.querySelector('.deliver__entry-fields-wrap');
+  var shipmentFields = shipmentField.querySelectorAll('input');
+  var shipmentStore = shipmentArea.querySelector('.deliver__store');
+  var shipmentCourier = shipmentArea.querySelector('.deliver__courier');
+  var shipmentToggle = shipmentArea.querySelector('.deliver__toggle');
+  var shipmentFloor = shipmentArea.querySelector('#deliver__floor');
+
+  var popupSuccess = document.querySelector('.modal--success');
+  var popupError = document.querySelector('.modal--error');
+  var popupValidation = document.querySelector('.modal--validation');
+
   var submitForm = document.querySelector('.buy form');
-  var cardStatus = document.querySelector('.payment__card-status');
-  var storeList = document.querySelector('.deliver__store-list');
+  var creditCardStatus = document.querySelector('.payment__card-status');
+  var stores = document.querySelectorAll('.deliver__store-list li input');
+
   var map = document.querySelector('.deliver__store-map-wrap');
   var mapDescription = map.querySelector('p');
 
@@ -29,22 +34,22 @@
   // --- переключение метода оплаты безнал/кэш --------------------------------
   var payMethodToggleHandler = function () {
     if (payCard.checked === true) {
-      creditCard.classList.remove('visually-hidden');
-      cash.classList.add('visually-hidden');
-      [].forEach.call(creditCardInputs, function (item) {
+      payCreditCard.classList.remove('visually-hidden');
+      payCash.classList.add('visually-hidden');
+      [].forEach.call(payCreditCardFields, function (item) {
         item.required = true;
       });
-      [].forEach.call(paymentGroup, function (item) {
+      [].forEach.call(payFields, function (item) {
         item.required = true;
         item.disabled = false;
       });
     } else {
-      creditCard.classList.add('visually-hidden');
-      cash.classList.remove('visually-hidden');
-      [].forEach.call(creditCardInputs, function (item) {
+      payCreditCard.classList.add('visually-hidden');
+      payCash.classList.remove('visually-hidden');
+      [].forEach.call(payCreditCardFields, function (item) {
         item.required = false;
       });
-      [].forEach.call(paymentGroup, function (item) {
+      [].forEach.call(payFields, function (item) {
         item.required = false;
         item.disabled = true;
         item.value = '';
@@ -55,32 +60,34 @@
 
   // обработка формы доставки -------------------------------------------------
   // --- переключение доставка/самовывоз --------------------------------------
-  var deliveryToggleHandler = function () {
+  var shipmentToggleHandler = function () {
     if (store.checked === true) {
-      deliveryStore.classList.remove('visually-hidden');
-      deliveryCourier.classList.add('visually-hidden');
-      [].forEach.call(deliveryInputs, function (item) {
+      shipmentStore.classList.remove('visually-hidden');
+      shipmentCourier.classList.add('visually-hidden');
+      [].forEach.call(shipmentFields, function (item) {
         item.required = false;
+        item.disabled = true;
       });
 
     }
     if (courier.checked === true) {
-      deliveryStore.classList.add('visually-hidden');
-      deliveryCourier.classList.remove('visually-hidden');
-      [].forEach.call(deliveryInputs, function (item) {
+      shipmentStore.classList.add('visually-hidden');
+      shipmentCourier.classList.remove('visually-hidden');
+      [].forEach.call(shipmentFields, function (item) {
         item.required = true;
+        item.disabled = false;
       });
-      deliveryFloor.required = false;
+      shipmentFloor.required = false;
     }
   };
-  deliveryToggle.addEventListener('click', deliveryToggleHandler);
+  shipmentToggle.addEventListener('click', shipmentToggleHandler);
 
   // связываем станцию метро и карту ------------------------------------------
   var showMap = function (evt) {
-    if (map.contains(mapDescription)) {
-      map.removeChild(mapDescription);
-    }
-    if (evt.target.value !== '') {
+    if (evt.target.value !== '' && typeof evt.target.value !== 'undefined') {
+      if (map.contains(mapDescription)) {
+        map.removeChild(mapDescription);
+      }
       map.querySelector('img').src = './img/map/' + evt.target.value + '.jpg';
     }
   };
@@ -91,17 +98,17 @@
       item.reset();
     });
     payMethodToggleHandler();
-    deliveryToggleHandler();
+    shipmentToggleHandler();
   };
 
   // обработка успешной/не успешной отправки данных на сервер -----------------
   var showSuccess = function () {
-    modalSuccess.classList.remove('modal--hidden');
+    popupSuccess.classList.remove('modal--hidden');
     document.addEventListener('keydown', window.util.onEscClose);
   };
 
   var showError = function () {
-    modalError.classList.remove('modal--hidden');
+    popupError.classList.remove('modal--hidden');
     document.addEventListener('keydown', window.util.onEscClose);
   };
 
@@ -114,19 +121,22 @@
   var onSubmitErrorHandle = function () {
     showError();
   };
+
   submitForm.addEventListener('submit', function (evt) {
     evt.preventDefault();
-    if (creditCard.classList.contains('visually-hidden')) {
+    if (payCreditCard.classList.contains('visually-hidden')) {
       window.backend.upload(new FormData(submitForm), onSubmitSuccessHandle, onSubmitErrorHandle);
     }
-    if (!creditCard.classList.contains('.visually-hidden') && cardStatus.textContent === 'Одобрен') {
+    if (!payCreditCard.classList.contains('.visually-hidden') && creditCardStatus.textContent === 'Одобрен') {
       window.backend.upload(new FormData(submitForm), onSubmitSuccessHandle, onSubmitErrorHandle);
     }
-    if (creditCard.value === '' && cardStatus.textContent !== 'Одобрен') {
-      modalValidation.classList.remove('modal--hidden');
+    if (payCreditCardNum.disabled !== true && creditCardStatus.textContent !== 'Одобрен') {
+      popupValidation.classList.remove('modal--hidden');
     }
   });
 
-  storeList.addEventListener('click', showMap);
+  [].forEach.call(stores, function (item) {
+    item.addEventListener('change', showMap);
+  });
 
 }());

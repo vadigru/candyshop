@@ -1,43 +1,45 @@
 'use strict';
 (function () {
   var main = document.querySelector('main');
-  var catalogCards = main.querySelector('.catalog__cards');
-  var catalogLoad = catalogCards.querySelector('.catalog__load');
+  var productArea = main.querySelector('.catalog__cards');
+  var emptyProductArea = productArea.querySelector('.catalog__load');
   var filterBar = main.querySelector('.catalog__sidebar');
-  var inputBtns = filterBar .querySelectorAll('.input-btn__label');
-  var rangeBtns = filterBar.querySelectorAll('.range__btn');
-  var showAllBtn = filterBar.querySelector('.catalog__submit');
+  var filterBtns = filterBar .querySelectorAll('.input-btn__label');
+  var filterRangeBtns = filterBar.querySelectorAll('.range__btn');
+  var filterCancelBtn = filterBar.querySelector('.catalog__submit');
   var error = document.querySelector('.modal--error');
 
+  var sweetArray = [];
+
   // поменять курсор с default на pointer -------------------------------------
-  [].forEach.call(inputBtns, function (item) {
+  [].forEach.call(filterBtns, function (item) {
     item.style.cursor = 'pointer';
   });
 
-  [].forEach.call(rangeBtns, function (item) {
+  [].forEach.call(filterRangeBtns, function (item) {
     item.style.cursor = 'pointer';
   });
 
-  showAllBtn.style.cursor = 'pointer';
+  filterCancelBtn.style.cursor = 'pointer';
 
   var setPointerToComposition = function () {
-    var compositionBtns = catalogCards.querySelectorAll('.card__btn-composition');
-    [].forEach.call(compositionBtns, function (item) {
+    var productCompositionBtns = productArea.querySelectorAll('.card__btn-composition');
+    [].forEach.call(productCompositionBtns, function (item) {
       item.style.cursor = 'pointer';
     });
   };
   // скрываем надпись пустого каталога ----------------------------------------
   var showSweetCards = function () {
-    catalogCards.classList.remove('catalog__cards--load');
-    catalogLoad.classList.add('visually-hidden');
+    productArea.classList.remove('catalog__cards--load');
+    emptyProductArea.classList.add('visually-hidden');
   };
 
   // обработка успешно загруженных данных -------------------------------------
   var onLoadSuccessHandle = function (data) {
-    window.sweetArray = data.map(function (current) {
+    window.catalog.sweetArray = data.map(function (current) {
       return current;
     });
-    window.sweetArray.forEach(function (item) {
+    window.catalog.sweetArray.forEach(function (item) {
       switch (item.kind) {
         case 'Мороженое':
           item.kind = 'icecream';
@@ -57,11 +59,11 @@
       }
       item.favorite = false;
     });
-    catalogCards.appendChild(window.renderSweetCards(window.sweetArray));
-    var cCards = catalogCards.querySelectorAll('.catalog__card');
-    window.cart.addAtribute(cCards, window.sweetArray);
-    window.cart.addCart(cCards, window.sweetArray);
-    window.favorites.addToFavorites(window.sweetArray);
+    productArea.appendChild(renderSweetCards(window.catalog.sweetArray));
+    var products = productArea.querySelectorAll('.catalog__card');
+    window.cart.addAtribute(products, window.catalog.sweetArray);
+    window.cart.addCart(products, window.catalog.sweetArray);
+    window.favorites.addToFavorites(window.catalog.sweetArray);
     window.filter.kindCount();
     showSweetCards();
     setPointerToComposition();
@@ -71,7 +73,7 @@
   var closeErrorHandler = function (evt) {
     var nodeIn = main.querySelector('.closeErrorDialog');
     var node = main.querySelector('.errorDialog');
-    if (evt.keyCode === 27) {
+    if (evt.keyCode === window.util.ESC_KEYCODE) {
       node.removeChild(nodeIn);
       main.removeChild(node);
       document.removeEventListener('keydown', closeErrorHandler);
@@ -112,38 +114,40 @@
   };
 
   // отображаем карточки со сладостями из массива -------------------------------
-  window.renderSweetCards = function (sweetData) {
+  var renderSweetCards = function (sweetData) {
     var fragment = document.createDocumentFragment();
     sweetData.forEach(function (item) {
-      var sweetElement = document.querySelector('#card').content.cloneNode(true);
-      var cardPrice = sweetElement.querySelector('.card__price');
-      var cardCurrency = sweetElement.querySelector('.card__currency');
-      var cardWeight = sweetElement.querySelector('.card__weight');
-      sweetElement.querySelector('.catalog__card').classList.remove('card--in-stock');
-      sweetElement.querySelector('.catalog__card').classList.add(amountToClassName(item.amount));
-      sweetElement.querySelector('.card__img').src = './img/cards/' + item.picture;
-      sweetElement.querySelector('.card__title').textContent = item.name;
-      sweetElement.querySelector('.card__img').alt = item.name;
-      cardPrice.textContent = item.price;
-      cardPrice.appendChild(cardCurrency);
-      cardPrice.appendChild(cardWeight);
-      sweetElement.querySelector('.card__weight').textContent = '/ ' + item.weight + ' Г';
-      sweetElement.querySelector('.stars__rating').classList.remove('stars__rating--five');
-      sweetElement.querySelector('.stars__rating').classList.add(valueToClassName[item.rating.value]);
-      sweetElement.querySelector('.star__count').textContent = item.rating.number;
-      sweetElement.querySelector('.card__characteristic').textContent = getSugar(item.nutritionFacts.sugar)
+      var productElement = document.querySelector('#card').content.cloneNode(true);
+      var productPrice = productElement.querySelector('.card__price');
+      var productCurrency = productElement.querySelector('.card__currency');
+      var productWeight = productElement.querySelector('.card__weight');
+      productElement.querySelector('.catalog__card').classList.remove('card--in-stock');
+      productElement.querySelector('.catalog__card').classList.add(amountToClassName(item.amount));
+      productElement.querySelector('.card__img').src = './img/cards/' + item.picture;
+      productElement.querySelector('.card__title').textContent = item.name;
+      productElement.querySelector('.card__img').alt = item.name;
+      productPrice.textContent = item.price;
+      productPrice.appendChild(productCurrency);
+      productPrice.appendChild(productWeight);
+      productElement.querySelector('.card__weight').textContent = '/ ' + item.weight + ' Г';
+      productElement.querySelector('.stars__rating').classList.remove('stars__rating--five');
+      productElement.querySelector('.stars__rating').classList.add(valueToClassName[item.rating.value]);
+      productElement.querySelector('.star__count').textContent = item.rating.number;
+      productElement.querySelector('.card__characteristic').textContent = getSugar(item.nutritionFacts.sugar)
       + '. ' +
       item.nutritionFacts.energy
       + ' ккал';
-      sweetElement.querySelector('.card__composition-list').textContent = item.nutritionFacts.contents;
-      fragment.appendChild(sweetElement);
+      productElement.querySelector('.card__composition-list').textContent = item.nutritionFacts.contents;
+      fragment.appendChild(productElement);
 
     });
     return fragment;
   };
 
   window.catalog = {
-    setPointerToComposition: setPointerToComposition
+    setPointerToComposition: setPointerToComposition,
+    renderSweetCards: renderSweetCards,
+    sweetArray: sweetArray
   };
 
 }());

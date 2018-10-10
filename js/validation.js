@@ -1,72 +1,97 @@
 'use strict';
 (function () {
-  var payment = document.querySelector('.payment');
-  var cardNumber = payment.querySelector('#payment__card-number');
-  var cardDate = payment.querySelector('#payment__card-date');
-  var cardCvc = payment.querySelector('#payment__card-cvc');
-  var cardHolder = payment.querySelector('#payment__cardholder');
+  var pay = document.querySelector('.payment');
+  var creditCardNumber = pay.querySelector('#payment__card-number');
+  var creditCardDate = pay.querySelector('#payment__card-date');
+  var creditCardCvc = pay.querySelector('#payment__card-cvc');
+  var creditCardHolder = pay.querySelector('#payment__cardholder');
+  var payFields = pay.querySelectorAll('input');
+  var MIN_NUM_LENGTH = 13;
+  var MAX_NUM_LENGTH = 16;
+  var CONTROL_NUM = 9;
+  var MIN_NUM_CVC = 100;
+  var MAX_NUM_CVC = 999;
+  var EVEN_CHECK = 2;
+  var EVEN_CHECK_RES = 10;
 
   // --- валидация карты по алгоритму луна ------------------------------------
-  var luhnCheck = function (string) {
-    var stringArray = string.split('');
+  var luhnCheckHandler = function () {
+    var creditCardValue = creditCardNumber.value;
+    var stringArray = creditCardValue.split('');
     var sum = 0;
     var result;
-    if (stringArray.length >= 13 && stringArray.length <= 16) {
+    if (stringArray.length >= MIN_NUM_LENGTH && stringArray.length <= MAX_NUM_LENGTH) {
       for (var i = 0; i < stringArray.length; i++) {
-        var number = parseInt(stringArray[i], 10);
-        if (stringArray.length % 2 === 0) {
-          if (i % 2 !== 0) {
-            sum += number;
+        var num = parseInt(stringArray[i], 10);
+        var multiplyNumber = num * 2;
+        if (stringArray.length % EVEN_CHECK === 0) {
+          if (i % EVEN_CHECK !== 0) {
+            sum += num;
           } else {
-            var oddIndex = number * 2;
-            if (oddIndex > 9) {
-              oddIndex -= 9;
+            var oddIndex = multiplyNumber;
+            if (oddIndex > CONTROL_NUM) {
+              oddIndex -= CONTROL_NUM;
               sum += oddIndex;
             } else {
               sum += oddIndex;
             }
           }
         } else {
-          if (i % 2 !== 0) {
-            var evenIndex = number * 2;
-            if (evenIndex > 9) {
-              evenIndex -= 9;
+          if (i % EVEN_CHECK !== 0) {
+            var evenIndex = multiplyNumber;
+            if (evenIndex > CONTROL_NUM) {
+              evenIndex -= CONTROL_NUM;
               sum += evenIndex;
             } else {
               sum += evenIndex;
             }
           } else {
-            sum += number;
+            sum += num;
           }
         }
       }
     } else {
       return false;
     }
-    result = sum % 10 === 0 ? true : false;
+    result = sum % EVEN_CHECK_RES === 0 ? true : false;
     return result;
   };
 
   // --- проверка даты ----------------------------------------------------------
-  var dateCheck = function () {
-    var date = cardDate.value;
+  var dateCheckHandler = function () {
+    var date = creditCardDate.value;
     var currentYear = (new Date()).getFullYear();
     var currentMonth = (new Date()).getMonth();
+    var monthCorrection = currentMonth + 1;
     var dateArr = date.split('/');
+    var firstArrEl = parseInt(dateArr[0], 10);
+    var secondArrEl = ('20' + parseInt(dateArr[1], 10));
     var result;
-    if (parseInt(dateArr[0], 10) < (currentMonth + 1) && ('20' + parseInt(dateArr[1], 10)) <= currentYear) {
+    if (firstArrEl < monthCorrection && secondArrEl <= currentYear || dateArr.length < 2) {
       result = false;
     } else {
+      result = true;
+    }
+    return result;
+  };
+
+  var cvcCheckHandler = function () {
+    var cvcNum = parseInt(creditCardCvc.value, 10);
+    var result;
+    if (cvcNum >= MIN_NUM_CVC && cvcNum <= MAX_NUM_CVC) {
       result = true;
     }
     return result;
   };
 
   // --- проверка имени ---------------------------------------------------------
-  var holderCheck = function (name) {
-    var holderArray = name.split(' ');
+  var holderCheckHandler = function () {
+    var creditCardHolderName = creditCardHolder.value;
+    var holderArray = creditCardHolderName.split(' ');
+    var arrEl = holderArray[0];
     var result;
-    if (holderArray.length < 2 || holderArray.length > 25) {
+    creditCardHolder.value = creditCardHolderName.toUpperCase();
+    if (arrEl === '') {
       result = false;
     } else {
       result = true;
@@ -74,27 +99,25 @@
     return result;
   };
 
-  // --- меняем имя на большие буквы --------------------------------------------
-  var nameChangeHandler = function () {
-    var cardHolderValue = cardHolder.value;
-    cardHolder.value = cardHolderValue.toUpperCase();
-  };
-
   // --- проверка правильности всех полей ---------------------------------------
-  var cardCheckHanler = function () {
-    var cardValue = cardNumber.value;
-    var cardHolderName = cardHolder.value;
-    var cardStatus = document.querySelector('.payment__card-status');
-    if (luhnCheck(cardValue) === true && dateCheck() === true && parseInt(cardCvc.value, 10) >= 100 && parseInt(cardCvc.value, 10) <= 999 && holderCheck(cardHolderName) === true) {
-      cardStatus.textContent = 'Одобрен';
+  var creditCardCheckHanler = function () {
+    var creditCardStatus = document.querySelector('.payment__card-status');
+    var luhn = luhnCheckHandler();
+    var date = dateCheckHandler();
+    var cvc = cvcCheckHandler();
+    var holder = holderCheckHandler();
+    if (luhn && date && cvc && holder) {
+      creditCardStatus.textContent = 'Одобрен';
     } else {
-      cardStatus.textContent = 'Неизвестен';
+      creditCardStatus.textContent = 'Неизвестен';
     }
   };
 
-  cardNumber.addEventListener('change', cardCheckHanler);
-  cardDate.addEventListener('change', cardCheckHanler);
-  cardCvc.addEventListener('change', cardCheckHanler);
-  cardHolder.addEventListener('change', cardCheckHanler);
-  cardHolder.addEventListener('input', nameChangeHandler);
+  creditCardNumber.addEventListener('change', luhnCheckHandler);
+  creditCardDate.addEventListener('change', dateCheckHandler);
+  creditCardCvc.addEventListener('change', cvcCheckHandler);
+  creditCardHolder.addEventListener('input', holderCheckHandler);
+  [].forEach.call(payFields, function (item) {
+    item.addEventListener('change', creditCardCheckHanler);
+  });
 }());
