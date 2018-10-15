@@ -105,23 +105,17 @@
 
   // --- увеличение/уменьшение количества товара в корзине --------------------
   var increasePrice = function (value, amount, price) {
-    // var basketItems = document.querySelectorAll('.goods_card .card-order__price');
     if (value.value === amount) {
       return;
     }
 
     totalPrice += price;
-    // arrangeFooterBasket(totalPrice, basketItems.length);
-    // totalValue++;
     arrangeFooterBasket(totalPrice, totalValue);
     arrangeHeaderBasket(totalValue);
     return;
   };
   var decreasePrice = function (price) {
-    // var basketItems = document.querySelectorAll('.goods_card .card-order__price');
     totalPrice -= price;
-    // arrangeFooterBasket(totalPrice, basketItems.length);
-    // totalValue--;
     arrangeFooterBasket(totalPrice, totalValue);
     arrangeHeaderBasket(totalValue);
   };
