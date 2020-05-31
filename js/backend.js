@@ -1,7 +1,7 @@
 'use strict';
 (function () {
-  var UPLOAD_URL = 'https://js.dump.academy/candyshop';
-  var LOAD_URL = 'https://js.dump.academy/candyshop/data';
+  var UPLOAD_URL = 'https://javascript.pages.academy/candyshop';
+  var LOAD_URL = 'https://javascript.pages.academy/candyshop/data';
   var SERVER_TIME = 10000;
   var Code = {
     OK: 200,
