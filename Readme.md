@@ -2,7 +2,8 @@
 
 * Студент: [Vadim Grunenko](https://up.htmlacademy.ru/javascript/15/user/507341)
 * Наставник: `без наставника`
-* Онлайн версия: https://vadigru.github.io/candyshop
+* Демо: https://vadigru.github.io/candyshop
+
 ---
 
 <a href="https://htmlacademy.ru/intensive/javascript"><img align="left" width="50" height="50" alt="HTML Academy" src="https://up.htmlacademy.ru/static/img/intensive/javascript/logo-for-github-2.png"></a>
