@@ -1,7 +1,7 @@
 'use strict';
 (function () {
-  var UPLOAD_URL = 'https://cors-anywhere.herokuapp.com/https://javascript.pages.academy/candyshop';
-  var LOAD_URL = 'https://cors-anywhere.herokuapp.com/https://javascript.pages.academy/candyshop/data';
+  var UPLOAD_URL = 'https://24.javascript.pages.academy/candyshop';
+  var LOAD_URL = 'https://24.javascript.pages.academy/candyshop/data';
   var SERVER_TIME = 10000;
   var Code = {
     OK: 200,
